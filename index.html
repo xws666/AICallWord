@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>提示词快捷复制</title>
   <style>
-    :root{
+    :root {
       /* Light theme */
       --bg: #f6f7fb;
-      --panel: rgba(255,255,255,0.75);
-      --panel2: rgba(255,255,255,0.92);
+      --panel: rgba(255, 255, 255, 0.75);
+      --panel2: rgba(255, 255, 255, 0.92);
       --border: rgba(15, 23, 42, 0.12);
       --text: rgba(15, 23, 42, 0.92);
       --muted: rgba(15, 23, 42, 0.68);
@@ -23,51 +24,92 @@
       --cardImgW: 140px;
     }
 
-    *{ box-sizing: border-box; }
-    html,body{ height: 100%; }
-    body{
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
       margin: 0;
       color: var(--text);
       background:
-        radial-gradient(1200px 800px at 20% 0%, rgba(91,92,255,0.14), transparent 55%),
-        radial-gradient(900px 700px at 90% 15%, rgba(56,189,248,0.10), transparent 55%),
-        radial-gradient(900px 800px at 50% 110%, rgba(225,29,72,0.07), transparent 55%),
+        radial-gradient(1200px 800px at 20% 0%, rgba(91, 92, 255, 0.14), transparent 55%),
+        radial-gradient(900px 700px at 90% 15%, rgba(56, 189, 248, 0.10), transparent 55%),
+        radial-gradient(900px 800px at 50% 110%, rgba(225, 29, 72, 0.07), transparent 55%),
         linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
       font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, "Noto Sans", "Helvetica Neue", sans-serif;
       line-height: 1.5;
     }
 
-    a{ color: inherit; }
-    .container{
+    a {
+      color: inherit;
+    }
+
+    .container {
       max-width: var(--maxw);
       margin: 0 auto;
       padding: 28px 16px 92px;
     }
-    header{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
       gap: 12px;
       margin-bottom: 18px;
     }
-    .title{
-      display:flex;
-      flex-direction:column;
+
+    .title {
+      display: flex;
+      flex-direction: column;
       gap: 6px;
     }
-    .title h1{
+
+    .title h1 {
       font-size: 22px;
       margin: 0;
       letter-spacing: 0.2px;
     }
-    .title p{
+
+    .title h1.clickable {
+      cursor: pointer;
+      position: relative;
+    }
+
+    .title h1.clickable::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 84px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(91, 92, 255, 0.0), rgba(91, 92, 255, 0.65), rgba(91, 92, 255, 0.0));
+      opacity: 0;
+      transform: scaleX(0.5);
+      transform-origin: center;
+      transition: opacity 160ms ease, transform 160ms ease;
+      pointer-events: none;
+    }
+
+    .title h1.clickable:hover::after {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+
+    .title p {
       margin: 0;
       color: var(--muted);
       font-size: 13px;
     }
-    .pill{
-      display:inline-flex;
-      align-items:center;
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
       padding: 10px 12px;
       border: 1px solid var(--border);
@@ -78,27 +120,39 @@
       user-select: none;
       backdrop-filter: blur(10px);
     }
-    .dot{
-      width: 8px; height: 8px; border-radius: 50%;
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       background: rgba(15, 23, 42, 0.25);
     }
-    .dot.ok{ background: #30d158; }
-    .dot.bad{ background: var(--danger); }
 
-    .grid{
-      display:grid;
+    .dot.ok {
+      background: #30d158;
+    }
+
+    .dot.bad {
+      background: var(--danger);
+    }
+
+    .grid {
+      display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
     }
-    @media (max-width: 860px){
-      .grid{ grid-template-columns: 1fr; }
+
+    @media (max-width: 860px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
     }
 
-    .card{
-      display:flex;
+    .card {
+      display: flex;
       gap: 12px;
       border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.82));
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.82));
       border-radius: var(--radius);
       padding: 12px;
       box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
@@ -106,159 +160,184 @@
       backdrop-filter: blur(10px);
       min-height: 124px;
     }
-    .thumb{
+
+    .thumb {
       width: var(--cardImgW);
       min-width: var(--cardImgW);
       height: 110px;
       border-radius: var(--radius2);
       border: 1px solid rgba(15, 23, 42, 0.12);
       background: rgba(15, 23, 42, 0.03);
-      overflow:hidden;
+      overflow: hidden;
       position: relative;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: var(--muted2);
       font-size: 12px;
       user-select: none;
     }
-    .thumb img{
+
+    .thumb img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display:block;
+      display: block;
     }
-    .content{
+
+    .content {
       flex: 1;
-      display:flex;
-      flex-direction:column;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
       min-width: 0;
     }
-    .text{
+
+    .text {
       white-space: pre-wrap;
       word-break: break-word;
       color: var(--text);
       font-size: 14px;
       flex: 1;
     }
-    .meta{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: 8px;
       color: var(--muted2);
       font-size: 12px;
     }
-    .btn{
+
+    .btn {
       border: 1px solid var(--border);
-      background: rgba(255,255,255,0.85);
+      background: rgba(255, 255, 255, 0.85);
       color: var(--text);
       padding: 8px 10px;
       border-radius: 12px;
-      cursor:pointer;
+      cursor: pointer;
       transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
       user-select: none;
       font-size: 13px;
     }
-    .btn:hover{
+
+    .btn:hover {
       transform: translateY(-1px);
-      background: rgba(255,255,255,0.98);
+      background: rgba(255, 255, 255, 0.98);
       border-color: rgba(15, 23, 42, 0.18);
     }
-    .btn.primary{
-      border-color: rgba(91,92,255,0.55);
-      background: rgba(91,92,255,0.14);
+
+    .btn.primary {
+      border-color: rgba(91, 92, 255, 0.55);
+      background: rgba(91, 92, 255, 0.14);
     }
-    .btn.primary:hover{
-      background: rgba(91,92,255,0.18);
-      border-color: rgba(91,92,255,0.75);
+
+    .btn.primary:hover {
+      background: rgba(91, 92, 255, 0.18);
+      border-color: rgba(91, 92, 255, 0.75);
     }
-    .btn.ghost{
+
+    .btn.ghost {
       background: transparent;
     }
-    .btn.danger{
-      border-color: rgba(225,29,72,0.35);
-      background: rgba(225,29,72,0.10);
+
+    .btn.danger {
+      border-color: rgba(225, 29, 72, 0.35);
+      background: rgba(225, 29, 72, 0.10);
     }
-    .btn.danger:hover{
-      background: rgba(225,29,72,0.14);
-      border-color: rgba(225,29,72,0.55);
+
+    .btn.danger:hover {
+      background: rgba(225, 29, 72, 0.14);
+      border-color: rgba(225, 29, 72, 0.55);
     }
-    .btn:disabled{
+
+    .btn:disabled {
       opacity: 0.55;
-      cursor:not-allowed;
-      transform:none !important;
+      cursor: not-allowed;
+      transform: none !important;
     }
-    .toolbar{
-      display:flex;
+
+    .toolbar {
+      display: flex;
       gap: 8px;
       flex-wrap: wrap;
-      align-items:center;
-      justify-content:flex-end;
+      align-items: center;
+      justify-content: flex-end;
     }
-    .statusRow{
-      display:flex;
+
+    .statusRow {
+      display: flex;
       gap: 10px;
-      align-items:center;
-      justify-content:space-between;
+      align-items: center;
+      justify-content: space-between;
       margin: 12px 0 16px;
       color: var(--muted);
       font-size: 13px;
     }
-    .hint{
+
+    .hint {
       color: var(--muted2);
       font-size: 12px;
     }
 
     /* Bottom add button */
-    .fabBar{
+    .fabBar {
       position: fixed;
-      left: 0; right: 0; bottom: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       padding: 14px 16px 18px;
-      background: linear-gradient(180deg, transparent, rgba(246,247,251,0.75) 30%, rgba(246,247,251,0.96));
+      background: linear-gradient(180deg, transparent, rgba(246, 247, 251, 0.75) 30%, rgba(246, 247, 251, 0.96));
       backdrop-filter: blur(10px);
       z-index: 20;
     }
-    .fabWrap{
+
+    .fabWrap {
       max-width: var(--maxw);
       margin: 0 auto;
-      display:flex;
-      justify-content:center;
+      display: flex;
+      justify-content: center;
     }
-    .fab{
+
+    .fab {
       width: min(520px, 100%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 10px;
       padding: 14px 16px;
       border-radius: 999px;
-      border: 1px solid rgba(91,92,255,0.55);
-      background: linear-gradient(180deg, rgba(91,92,255,0.18), rgba(91,92,255,0.12));
-      box-shadow: 0 18px 50px rgba(91,92,255,0.16);
-      cursor:pointer;
+      border: 1px solid rgba(91, 92, 255, 0.55);
+      background: linear-gradient(180deg, rgba(91, 92, 255, 0.18), rgba(91, 92, 255, 0.12));
+      box-shadow: 0 18px 50px rgba(91, 92, 255, 0.16);
+      cursor: pointer;
       color: var(--text);
       font-size: 15px;
       user-select: none;
       transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
     }
-    .fab:hover{
+
+    .fab:hover {
       transform: translateY(-1px);
-      border-color: rgba(91,92,255,0.80);
-      background: linear-gradient(180deg, rgba(91,92,255,0.22), rgba(91,92,255,0.14));
+      border-color: rgba(91, 92, 255, 0.80);
+      background: linear-gradient(180deg, rgba(91, 92, 255, 0.22), rgba(91, 92, 255, 0.14));
     }
 
     /* Modal */
-    .overlay{
+    .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.55);
-      display:none;
+      background: rgba(0, 0, 0, 0.55);
+      display: none;
       z-index: 50;
     }
-    .overlay.open{ display:block; }
-    .modal{
+
+    .overlay.open {
+      display: block;
+    }
+
+    .modal {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -266,35 +345,42 @@
       width: min(860px, calc(100% - 24px));
       border-radius: 18px;
       border: 1px solid rgba(15, 23, 42, 0.12);
-      background: rgba(255,255,255,0.96);
+      background: rgba(255, 255, 255, 0.96);
       box-shadow: var(--shadow);
       overflow: hidden;
       backdrop-filter: blur(16px);
     }
-    .modalHead{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+
+    .modalHead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 10px;
       padding: 14px 14px;
       border-bottom: 1px solid rgba(15, 23, 42, 0.10);
       background: rgba(15, 23, 42, 0.02);
     }
-    .modalHead h2{
+
+    .modalHead h2 {
       margin: 0;
       font-size: 15px;
       letter-spacing: 0.2px;
     }
-    .modalBody{
+
+    .modalBody {
       padding: 14px;
-      display:grid;
+      display: grid;
       grid-template-columns: 1.3fr 0.7fr;
       gap: 12px;
     }
-    @media (max-width: 860px){
-      .modalBody{ grid-template-columns: 1fr; }
+
+    @media (max-width: 860px) {
+      .modalBody {
+        grid-template-columns: 1fr;
+      }
     }
-    textarea{
+
+    textarea {
       width: 100%;
       min-height: 260px;
       border-radius: 14px;
@@ -307,11 +393,13 @@
       font-size: 14px;
       line-height: 1.55;
     }
-    textarea:focus{
-      border-color: rgba(91,92,255,0.55);
-      box-shadow: 0 0 0 4px rgba(91,92,255,0.14);
+
+    textarea:focus {
+      border-color: rgba(91, 92, 255, 0.55);
+      box-shadow: 0 0 0 4px rgba(91, 92, 255, 0.14);
     }
-    input[type="text"]{
+
+    input[type="text"] {
       width: 100%;
       height: 44px;
       border-radius: 14px;
@@ -322,93 +410,107 @@
       outline: none;
       font-size: 14px;
     }
-    input[type="text"]:focus{
-      border-color: rgba(91,92,255,0.55);
-      box-shadow: 0 0 0 4px rgba(91,92,255,0.14);
+
+    input[type="text"]:focus {
+      border-color: rgba(91, 92, 255, 0.55);
+      box-shadow: 0 0 0 4px rgba(91, 92, 255, 0.14);
     }
-    .fieldLabel{
+
+    .fieldLabel {
       color: var(--muted2);
       font-size: 12px;
       margin: 2px 0 8px;
       user-select: none;
     }
-    .drop{
+
+    .drop {
       border-radius: 14px;
       border: 1px dashed rgba(15, 23, 42, 0.22);
       background: rgba(15, 23, 42, 0.02);
       padding: 12px;
       min-height: 260px;
-      display:flex;
-      flex-direction:column;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
-      justify-content:center;
-      align-items:center;
+      justify-content: center;
+      align-items: center;
       color: var(--muted);
-      text-align:center;
+      text-align: center;
       user-select: none;
       transition: border-color 120ms ease, background 120ms ease, transform 120ms ease;
     }
-    .drop.dragover{
-      border-color: rgba(91,92,255,0.60);
-      background: rgba(91,92,255,0.08);
+
+    .drop.dragover {
+      border-color: rgba(91, 92, 255, 0.60);
+      background: rgba(91, 92, 255, 0.08);
       transform: translateY(-1px);
     }
-    .preview{
+
+    .preview {
       width: 100%;
       max-height: 180px;
       border-radius: 12px;
       border: 1px solid rgba(15, 23, 42, 0.12);
       object-fit: cover;
-      display:none;
+      display: none;
     }
-    .dropActions{
-      display:flex;
+
+    .dropActions {
+      display: flex;
       gap: 8px;
-      flex-wrap:wrap;
-      justify-content:center;
+      flex-wrap: wrap;
+      justify-content: center;
     }
-    .modalFoot{
+
+    .modalFoot {
       padding: 14px;
       border-top: 1px solid rgba(15, 23, 42, 0.10);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: 12px;
     }
-    .toast{
+
+    .toast {
       position: fixed;
       left: 50%;
       bottom: 92px;
       transform: translateX(-50%);
-      background: rgba(255,255,255,0.92);
+      background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(15, 23, 42, 0.12);
       color: var(--text);
       border-radius: 999px;
       padding: 10px 14px;
       box-shadow: 0 14px 45px rgba(15, 23, 42, 0.16);
-      display:none;
+      display: none;
       z-index: 80;
       max-width: min(var(--maxw), calc(100% - 24px));
-      overflow:hidden;
-      text-overflow:ellipsis;
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
       backdrop-filter: blur(12px);
       font-size: 13px;
     }
-    .toast.show{ display:block; }
-    .empty{
+
+    .toast.show {
+      display: block;
+    }
+
+    .empty {
       border: 1px dashed rgba(15, 23, 42, 0.18);
-      background: rgba(255,255,255,0.78);
+      background: rgba(255, 255, 255, 0.78);
       border-radius: var(--radius);
       padding: 18px;
       color: var(--muted);
-      text-align:center;
+      text-align: center;
     }
-    .small{
+
+    .small {
       font-size: 12px;
       color: var(--muted2);
     }
-    code{
+
+    code {
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
       color: rgba(15, 23, 42, 0.86);
@@ -419,12 +521,13 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <header>
       <div class="title">
-        <h1>提示词快捷复制</h1>
-        <p>用 LeanCloud 存储你的提示词（可选配图），一键添加、随时复用。</p>
+        <h1 id="pageTitle" class="clickable" title="点击可进入隐藏空间">提示词快捷复制</h1>
+        <p id="subtitle">用 LeanCloud 存储你的提示词（可选配图），一键添加、随时复用。</p>
       </div>
       <div class="pill" title="LeanCloud 连接状态">
         <span id="connDot" class="dot"></span>
@@ -479,7 +582,7 @@
           <div class="drop" id="dropArea">
             <img id="previewImg" class="preview" alt="预览图" />
             <div id="dropText">
-              拖拽图片到这里<br/>
+              拖拽图片到这里<br />
               或点击选择图片
             </div>
             <div class="dropActions">
@@ -515,10 +618,12 @@
     // 可选：自定义服务器地址（一般不需要）
     const LEANCLOUD_SERVER_URL = "https://kmirsppu.api.lncldglobal.com";
 
-    const CLASS_NAME = "PromptItem";
+    const CLASS_NAME_MAIN = "PromptItem";
+    const CLASS_NAME_SECRET = "PromptItemSecret";
     const FIELD_TITLE = "title";
     const FIELD_TEXT = "text";
     const FIELD_IMAGE = "image"; // AV.File
+    const SECRET_PASSWORD = "475397";
 
     const el = {
       connDot: document.getElementById("connDot"),
@@ -545,41 +650,60 @@
       toast: document.getElementById("toast"),
       saveHint: document.getElementById("saveHint"),
       modalTitle: document.getElementById("modalTitle"),
+      pageTitle: document.getElementById("pageTitle"),
+      subtitle: document.getElementById("subtitle"),
     };
 
     let selectedFile = null; // File
     let imageEditMode = "none"; // "none" | "keep" | "remove" | "replace"
     let editingId = null; // string|null
     let toastTimer = null;
+    let isSecretMode = false;
 
-    function showToast(message, ms = 2200){
+    function getClassName() {
+      return isSecretMode ? CLASS_NAME_SECRET : CLASS_NAME_MAIN;
+    }
+
+    function updateModeUI() {
+      if (isSecretMode) {
+        el.pageTitle.textContent = "提示词快捷复制 · 私密空间";
+        el.subtitle.textContent = "当前为隐藏空间，此处添加的提示词只在这里显示。";
+        el.userHint.textContent = "（私密空间）";
+      } else {
+        el.pageTitle.textContent = "提示词快捷复制";
+        el.subtitle.textContent = "用 LeanCloud 存储你的提示词（可选配图），一键添加、随时复用。";
+        el.userHint.textContent = "";
+      }
+    }
+
+    function showToast(message, ms = 2200) {
       clearTimeout(toastTimer);
       el.toast.textContent = message;
       el.toast.classList.add("show");
       toastTimer = setTimeout(() => el.toast.classList.remove("show"), ms);
     }
 
-    function fmtDate(d){
-      try{
+    function fmtDate(d) {
+      try {
         const dt = (d instanceof Date) ? d : new Date(d);
         return dt.toLocaleString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
-      }catch(_){
+      } catch (_) {
         return "";
       }
     }
 
-    function isConfigured(){
+    function isConfigured() {
       return LEANCLOUD_APP_ID && LEANCLOUD_APP_KEY &&
         LEANCLOUD_APP_ID !== "YOUR_APP_ID" && LEANCLOUD_APP_KEY !== "YOUR_APP_KEY";
     }
 
-    function setConn(ok, text){
+    function setConn(ok, text) {
       el.connDot.classList.toggle("ok", !!ok);
       el.connDot.classList.toggle("bad", ok === false);
       el.connText.textContent = text;
     }
 
-    function startCreate(){
+    function startCreate() {
       editingId = null;
       imageEditMode = "none";
       selectedFile = null;
@@ -592,20 +716,20 @@
       setImagePreview(null);
     }
 
-    function openModal(){
+    function openModal() {
       startCreate();
       el.overlay.classList.add("open");
       el.overlay.setAttribute("aria-hidden", "false");
       setTimeout(() => el.promptInput.focus(), 0);
     }
-    function closeModal(){
+    function closeModal() {
       el.overlay.classList.remove("open");
       el.overlay.setAttribute("aria-hidden", "true");
     }
 
-    function setImagePreview(file){
+    function setImagePreview(file) {
       selectedFile = file || null;
-      if (!selectedFile){
+      if (!selectedFile) {
         el.previewImg.style.display = "none";
         el.previewImg.src = "";
         el.dropText.style.display = "block";
@@ -619,10 +743,10 @@
       el.clearImgBtn.style.display = "inline-flex";
     }
 
-    function setImagePreviewUrl(url){
+    function setImagePreviewUrl(url) {
       selectedFile = null;
       el.previewImg.src = url || "";
-      if (!url){
+      if (!url) {
         el.previewImg.style.display = "none";
         el.dropText.style.display = "block";
         el.clearImgBtn.style.display = "none";
@@ -633,7 +757,7 @@
       el.clearImgBtn.style.display = "inline-flex";
     }
 
-    function getImageFromEvent(e){
+    function getImageFromEvent(e) {
       const dt = e.dataTransfer;
       if (!dt || !dt.files || !dt.files.length) return null;
       const f = dt.files[0];
@@ -641,13 +765,13 @@
       return f;
     }
 
-    async function copyToClipboard(text){
-      try{
+    async function copyToClipboard(text) {
+      try {
         await navigator.clipboard.writeText(text);
         return true;
-      }catch(_){
+      } catch (_) {
         // fallback
-        try{
+        try {
           const ta = document.createElement("textarea");
           ta.value = text;
           ta.style.position = "fixed";
@@ -658,26 +782,26 @@
           const ok = document.execCommand("copy");
           document.body.removeChild(ta);
           return ok;
-        }catch(__){
+        } catch (__) {
           return false;
         }
       }
     }
 
-    function escapeHtml(s){
+    function escapeHtml(s) {
       return String(s)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    function renderItems(items){
+    function renderItems(items) {
       el.grid.innerHTML = "";
       el.emptyState.style.display = items.length ? "none" : "block";
 
-      for (const obj of items){
+      for (const obj of items) {
         const id = obj.id;
         const title = (obj.get(FIELD_TITLE) || "").trim();
         const text = obj.get(FIELD_TEXT) || "";
@@ -690,19 +814,19 @@
 
         const left = document.createElement("div");
         left.className = "thumb";
-        if (imgUrl){
+        if (imgUrl) {
           const image = document.createElement("img");
           image.src = imgUrl;
           image.alt = "图片";
           left.appendChild(image);
-        }else{
+        } else {
           left.textContent = "无图片";
         }
 
         const right = document.createElement("div");
         right.className = "content";
 
-        if (title){
+        if (title) {
           const titleEl = document.createElement("div");
           titleEl.style.fontSize = "14px";
           titleEl.style.fontWeight = "700";
@@ -760,15 +884,15 @@
         delBtn.textContent = "删除";
         delBtn.addEventListener("click", async () => {
           if (!confirm("确定删除这条提示词吗？")) return;
-          try{
+          try {
             delBtn.disabled = true;
             await obj.destroy();
             showToast("已删除");
             await loadList();
-          }catch(err){
+          } catch (err) {
             console.error(err);
             showToast("删除失败，请检查控制台错误");
-          }finally{
+          } finally {
             delBtn.disabled = false;
           }
         });
@@ -788,8 +912,8 @@
       }
     }
 
-    async function loadList(){
-      if (!isConfigured()){
+    async function loadList() {
+      if (!isConfigured()) {
         el.countText.textContent = "未配置 LeanCloud AppId/AppKey（请先在代码里替换）";
         el.userHint.textContent = "";
         renderItems([]);
@@ -797,19 +921,20 @@
         return;
       }
 
-      try{
+      try {
         el.countText.textContent = "正在从云端加载…";
-        el.userHint.textContent = "";
 
-        const query = new AV.Query(CLASS_NAME);
+        const query = new AV.Query(getClassName());
         query.descending("createdAt");
         query.limit(200);
         const items = await query.find();
 
         el.countText.textContent = `共 ${items.length} 条`;
-        el.userHint.textContent = items.length ? "" : "（空）";
+        if (!items.length) {
+          el.userHint.textContent = isSecretMode ? "（私密空间暂无提示词）" : "（空）";
+        }
         renderItems(items);
-      }catch(err){
+      } catch (err) {
         console.error(err);
         el.countText.textContent = "加载失败（请检查 LeanCloud 配置/网络/CORS/权限）";
         showToast("加载失败，请打开控制台查看错误");
@@ -817,36 +942,37 @@
       }
     }
 
-    async function saveItem(){
+    async function saveItem() {
       const title = (el.titleInput.value || "").trim();
       const text = (el.promptInput.value || "").trim();
-      if (!text){
+      if (!text) {
         showToast("请先输入提示词内容");
         el.promptInput.focus();
         return;
       }
-      if (!isConfigured()){
+      if (!isConfigured()) {
         showToast("请先配置 LeanCloud AppId/AppKey");
         return;
       }
 
       el.confirmBtn.disabled = true;
       el.confirmBtn.textContent = "保存中…";
-      try{
+      try {
+        const clsName = getClassName();
         const obj = editingId
-          ? AV.Object.createWithoutData(CLASS_NAME, editingId)
-          : new AV.Object(CLASS_NAME);
+          ? AV.Object.createWithoutData(clsName, editingId)
+          : new AV.Object(clsName);
 
         if (title) obj.set(FIELD_TITLE, title);
         else if (editingId && typeof obj.unset === "function") obj.unset(FIELD_TITLE);
         obj.set(FIELD_TEXT, text);
 
-        if (selectedFile){
+        if (selectedFile) {
           const avFile = new AV.File(selectedFile.name || "image", selectedFile);
           await avFile.save();
           obj.set(FIELD_IMAGE, avFile);
           imageEditMode = "replace";
-        }else if (editingId && imageEditMode === "remove"){
+        } else if (editingId && imageEditMode === "remove") {
           // remove image
           obj.set(FIELD_IMAGE, null);
         }
@@ -858,22 +984,22 @@
         startCreate();
         closeModal();
         await loadList();
-      }catch(err){
+      } catch (err) {
         console.error(err);
         showToast("保存失败，请打开控制台查看错误");
-      }finally{
+      } finally {
         el.confirmBtn.disabled = false;
         el.confirmBtn.textContent = editingId ? "保存修改" : "确认保存";
       }
     }
 
-    function initLeanCloud(){
-      if (!isConfigured()){
+    function initLeanCloud() {
+      if (!isConfigured()) {
         setConn(false, "未配置");
         el.saveHint.innerHTML = `请在 <code>index.html</code> 里把 <code>LEANCLOUD_APP_ID</code> / <code>LEANCLOUD_APP_KEY</code> 替换成你自己的值。`;
         return;
       }
-      try{
+      try {
         AV.init({
           appId: LEANCLOUD_APP_ID,
           appKey: LEANCLOUD_APP_KEY,
@@ -881,7 +1007,7 @@
         });
         setConn(true, "已初始化");
         el.saveHint.textContent = "提示：拖拽/选择图片可选；不上传也能保存。";
-      }catch(err){
+      } catch (err) {
         console.error(err);
         setConn(false, "初始化失败");
       }
@@ -900,12 +1026,12 @@
 
     el.refreshBtn.addEventListener("click", () => loadList());
     el.copyAllBtn.addEventListener("click", async () => {
-      if (!isConfigured()){
+      if (!isConfigured()) {
         showToast("请先配置 LeanCloud AppId/AppKey");
         return;
       }
-      try{
-        const query = new AV.Query(CLASS_NAME);
+      try {
+        const query = new AV.Query(getClassName());
         query.descending("createdAt");
         query.limit(200);
         const items = await query.find();
@@ -917,13 +1043,13 @@
           if (t) return `【${t}】`;
           return x;
         }).filter(Boolean).join("\n\n---\n\n");
-        if (!allText){
+        if (!allText) {
           showToast("没有可复制的内容");
           return;
         }
         const ok = await copyToClipboard(allText);
         showToast(ok ? "已复制全部到剪贴板" : "复制失败，请检查浏览器权限");
-      }catch(err){
+      } catch (err) {
         console.error(err);
         showToast("复制失败，请打开控制台查看错误");
       }
@@ -934,10 +1060,10 @@
     el.pickImgBtn.addEventListener("click", () => el.fileInput.click());
     el.fileInput.addEventListener("change", () => {
       const f = el.fileInput.files && el.fileInput.files[0] ? el.fileInput.files[0] : null;
-      if (f && f.type && f.type.startsWith("image/")){
+      if (f && f.type && f.type.startsWith("image/")) {
         setImagePreview(f);
         imageEditMode = "replace";
-      }else{
+      } else {
         setImagePreview(null);
         imageEditMode = editingId ? "keep" : "none";
       }
@@ -949,14 +1075,14 @@
     });
 
     // Drag & drop
-    ["dragenter","dragover"].forEach(evt => {
+    ["dragenter", "dragover"].forEach(evt => {
       el.dropArea.addEventListener(evt, (e) => {
         e.preventDefault();
         e.stopPropagation();
         el.dropArea.classList.add("dragover");
       });
     });
-    ["dragleave","drop"].forEach(evt => {
+    ["dragleave", "drop"].forEach(evt => {
       el.dropArea.addEventListener(evt, (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -965,7 +1091,7 @@
     });
     el.dropArea.addEventListener("drop", (e) => {
       const f = getImageFromEvent(e);
-      if (!f){
+      if (!f) {
         showToast("请拖入图片文件");
         return;
       }
@@ -979,9 +1105,29 @@
       el.fileInput.click();
     });
 
+    // Secret mode toggle
+    el.pageTitle.addEventListener("click", () => {
+      // 进入私密空间
+      if (!isSecretMode) {
+        isSecretMode = true;
+        showToast("已进入私密空间");
+        updateModeUI();
+        loadList();
+
+      } else {
+        // 从私密空间返回普通空间，无需密码
+        isSecretMode = false;
+        showToast("已返回普通空间");
+        updateModeUI();
+        loadList();
+      }
+    });
+
     // Boot
     initLeanCloud();
+    updateModeUI();
     loadList();
   </script>
 </body>
+
 </html>
